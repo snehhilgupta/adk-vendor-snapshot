@@ -16,7 +16,8 @@ ADK is Google's code-first framework for building agents. This repo is an indepe
 adk-vendor-snapshot/
 ├── docs/                       # one markdown file per stage
 │   ├── stage-0-setup.md
-│   └── stage-1-bare-agent.md
+│   ├── stage-1-bare-agent.md
+│   └── stage-2-grounded-search.md
 ├── vendor_snapshot/            # the agent package
 │   ├── init.py
 │   ├── agent.py
@@ -29,7 +30,7 @@ adk-vendor-snapshot/
 |-------|---------|--------|
 | 0 | Environment, project skeleton, placeholder agent | ✅ |
 | 1 | Single agent, no tools — see training-data limits | ✅ |
-| 2 | Built-in Google Search grounding | — |
+| 2 | Built-in Google Search grounding | ✅ |
 | 3 | Structured output via Pydantic schema | — |
 | 4 | Custom function tool + tool composition | — |
 | 5 | Multi-agent SequentialAgent (Researcher → Analyst → Writer) | — |
