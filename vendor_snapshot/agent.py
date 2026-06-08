@@ -1,7 +1,18 @@
-from google.adk.agents import Agent
+from google.adk.agents import Agent, SequentialAgent
 from google.adk.tools import google_search
+from pydantic import BaseModel, Field
+from typing import Optional
 
-VENDOR_SNAPSHOT_INSTRUCTION = """
+class VendorSnapshot(BaseModel):
+    company_name: str = Field(description="Canonical company name")
+    founded: Optional[str] = Field(default=None, description="Year founded")
+    headquarters: Optional[str] = Field(default=None, description="HQ location")
+    employee_band: Optional[str] = Field(default=None, description="Employee count band: 1-10, 11-50, 51-200, 201-1000, 1000+")
+    product_summary: str = Field(description="What the product does, 2-3 sentences max")
+    recent_activity: Optional[str] = Field(default=None, description="Funding, releases, news — last 12 months")
+    confidence_note: str = Field(description="Data quality caveat — sources, gaps, fabrication risk")
+
+RESEARCHER_INSTRUCTION = """
 You are a vendor research assistant with access to Google Search. The user will give you a vendor name. Use Google Search to find current information before responding.
 
 Produce a concise vendor snapshot covering:
@@ -17,12 +28,33 @@ Rules:
 - For "recent activity," cite the source URL inline next to each item.
 - If a field is unknown after searching, say "unknown" rather than guessing.
 - Use direct, factual language. No marketing copy.
-- Output as plain prose, not JSON or markdown tables.
 """.strip()
 
-root_agent = Agent(
-    name="vendor_snapshot",
+FORMATTER_INSTRUCTION = """
+You are a data formatter. You will receive raw vendor research text. Extract the information and return it as a structured JSON object matching the required schema exactly.
+
+Rules:
+- Do not add information not present in the input.
+- If a field is not present in the input, set it to null.
+- confidence_note must always be populated — summarize the sourcing quality from the input.
+- Do not search. Do not reason beyond what is in the input text.
+""".strip()
+
+researcher = Agent(
+    name="vendor_researcher",
     model="gemini-2.5-flash",
-    instruction=VENDOR_SNAPSHOT_INSTRUCTION,
+    instruction=RESEARCHER_INSTRUCTION,
     tools=[google_search],
+)
+
+formatter = Agent(
+    name="vendor_formatter",
+    model="gemini-2.5-flash",
+    instruction=FORMATTER_INSTRUCTION,
+    output_schema=VendorSnapshot,
+)
+
+root_agent = SequentialAgent(
+    name="vendor_snapshot",
+    sub_agents=[researcher, formatter],
 )
