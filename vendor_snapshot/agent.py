@@ -1,5 +1,6 @@
 from google.adk.agents import Agent, SequentialAgent
 from google.adk.tools import google_search
+from google.adk.tools.agent_tool import AgentTool
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -30,6 +31,30 @@ Rules:
 - Use direct, factual language. No marketing copy.
 """.strip()
 
+VERIFIER_INSTRUCTION = """
+You are a funding claim verifier with access to Google Search. You will receive a funding claim in this format:
+- Company name
+- Claimed amount
+- Claimed date
+
+Search for at least two independent sources that confirm or contradict this claim. Return one of three verdicts:
+- CONFIRMED: at least two independent sources corroborate the claim. List the sources.
+- CONTRADICTED: sources found that conflict with the claim. Explain the discrepancy.
+- UNVERIFIABLE: insufficient independent sources found. State what was and was not found.
+
+Be specific. Cite URLs. Do not guess.
+""".strip()
+
+ORCHESTRATOR_INSTRUCTION = """
+You are a vendor research orchestrator. When given a vendor name:
+
+1. Call vendor_researcher to gather raw vendor information.
+2. For each funding claim found in the research output, call vendor_verifier with the company name, claimed amount, and claimed date.
+3. Combine the research output and all verification verdicts into a single comprehensive summary. Include each verdict inline next to the relevant funding claim.
+
+Return the combined summary as plain prose. Do not format as JSON.
+""".strip()
+
 FORMATTER_INSTRUCTION = """
 You are a data formatter. You will receive raw vendor research text. Extract the information and return it as a structured JSON object matching the required schema exactly.
 
@@ -37,6 +62,7 @@ Rules:
 - Do not add information not present in the input.
 - If a field is not present in the input, set it to null.
 - confidence_note must always be populated — summarize the sourcing quality from the input.
+- Include any funding verification verdicts in the confidence_note field.
 - Do not search. Do not reason beyond what is in the input text.
 """.strip()
 
@@ -45,6 +71,20 @@ researcher = Agent(
     model="gemini-2.5-flash",
     instruction=RESEARCHER_INSTRUCTION,
     tools=[google_search],
+)
+
+verifier = Agent(
+    name="vendor_verifier",
+    model="gemini-2.5-flash",
+    instruction=VERIFIER_INSTRUCTION,
+    tools=[google_search],
+)
+
+orchestrator = Agent(
+    name="vendor_orchestrator",
+    model="gemini-2.5-flash",
+    instruction=ORCHESTRATOR_INSTRUCTION,
+    tools=[AgentTool(agent=researcher), AgentTool(agent=verifier)],
 )
 
 formatter = Agent(
@@ -56,5 +96,5 @@ formatter = Agent(
 
 root_agent = SequentialAgent(
     name="vendor_snapshot",
-    sub_agents=[researcher, formatter],
+    sub_agents=[orchestrator, formatter],
 )
