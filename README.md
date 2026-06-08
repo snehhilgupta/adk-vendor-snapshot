@@ -1,53 +1,75 @@
 # ADK Vendor Snapshot
 
-Learning Google's Agent Development Kit (ADK) by building an enterprise-style agent that takes a vendor name as input and returns a structured snapshot (company basics, product, recent activity, confidence note).
+A hands-on learning project for Google's Agent Development Kit (ADK). The use case is a Vendor Snapshot generator — input a vendor name, get a structured snapshot covering company basics, product summary, recent activity, and a confidence note.
 
-## Why this project
+## Use Case
 
-ADK is Google's code-first framework for building agents. This repo is an independent, hands-on study path — each stage adds one ADK primitive on top of the same use case so the learning is cumulative rather than scattered across throwaway examples.
+**Input:** vendor name (e.g. "Solace", "CrewAI")  
+**Output:** structured JSON snapshot per Pydantic schema
 
-## Stack
+**Test vendors:**
+- Solace — real, well-documented
+- CrewAI — real, fast-moving
+- AppOrchid — real, lower visibility
+- Quantix Mesh AI — fabricated, used for disambiguation and hallucination testing
 
-- **Framework:** Google ADK (Python, v2.1.0)
-- **Model:** Gemini 2.5 Flash via AI Studio (free tier)
-- **Python:** 3.14
+## Environment
 
-## Repository structure
+- Python 3.14, Windows, VS Code, PowerShell
+- ADK 2.1.0
+- Gemini 2.5 Flash via Vertex AI (CBRE GCP project)
+- Git + GitHub
+
+## Study Path
+
+| Stage | Concept | Doc | Status |
+|-------|---------|-----|--------|
+| 0 | Environment setup, project skeleton, placeholder agent | [stage-0-environment.md](docs/stage-0-environment.md) | ✅ |
+| 1 | Single agent, no tools — training data limits | [stage-1-bare-agent.md](docs/stage-1-bare-agent.md) | ✅ |
+| 2 | Built-in Google Search grounding | [stage-2-google-search.md](docs/stage-2-google-search.md) | ✅ |
+| 3 | Pydantic schema + two-agent search-formatter pipeline | [stage-3-pydantic-schema.md](docs/stage-3-pydantic-schema.md) | ✅ |
+| 4 | Custom function tool + AgentTool composition | [stage-4-custom-tools-agent-tool.md](docs/stage-4-custom-tools-agent-tool.md) | ✅ |
+| 5 | Multi-agent SequentialAgent with output_key session state | — | — |
+| 6 | Critic agent with deterministic vendor-name-match | — | — |
+| 7 | LoopAgent with termination-on-Critic-approved + callbacks | — | — |
+| 8 | Evaluation with adk eval — test sets, regression on 4 vendors | — | — |
+| 9 | Session state and in-process memory | — | — |
+| 10 | Deployment surfaces — architectural read-only | — | — |
+
+## Repository Structure
+
+```
 adk-vendor-snapshot/
-├── docs/                       # one markdown file per stage
-│   ├── stage-0-setup.md
-│   ├── stage-1-bare-agent.md
-│   └── stage-2-grounded-search.md
-├── vendor_snapshot/            # the agent package
-│   ├── init.py
+├── vendor_snapshot/
+│   ├── __init__.py
 │   ├── agent.py
-│   └── .env                    # API key — not committed
+│   └── .env
+├── docs/
+│   ├── stage-0-environment.md
+│   ├── stage-1-bare-agent.md
+│   ├── stage-2-google-search.md
+│   ├── stage-3-pydantic-schema.md
+│   └── stage-4-custom-tools-agent-tool.md
 ├── .gitignore
 └── README.md
-## Study path
+```
 
-| Stage | Concept | Status |
-|-------|---------|--------|
-| 0 | Environment, project skeleton, placeholder agent | ✅ |
-| 1 | Single agent, no tools — see training-data limits | ✅ |
-| 2 | Built-in Google Search grounding | ✅ |
-| 3 | Structured output via Pydantic schema | — |
-| 4 | Custom function tool + tool composition | — |
-| 5 | Multi-agent SequentialAgent (Researcher → Analyst → Writer) | — |
-| 6 | Critic agent with vendor-name-match | — |
-| 7 | LoopAgent + callbacks for guardrails | — |
-| 8 | Evaluation with `adk eval` | — |
-| 9 | Session state and in-process memory | — |
-| 10 | Deployment surfaces (architectural read-only) | — |
+## Key Findings by Stage
 
-## Running locally
+**Stage 1 — no tools:** Four failure modes documented: confident-stale (Solace), outdated-mental-model (CrewAI), partial-fabrication (AppOrchid), clean-refusal (Quantix Mesh AI). Clean refusal was the only correct behavior — triggered only because zero training data existed for the fabricated vendor.
 
-1. Install ADK: `pip install google-adk`
-2. Create `vendor_snapshot/.env` with your AI Studio API key:GOOGLE_GENAI_USE_VERTEXAI=FALSE
-GOOGLE_API_KEY=your_key_here
-3. From the project root: `adk web`
-4. Open http://localhost:8000 and select `vendor_snapshot`
+**Stage 2 — search grounding:** Recency and specific facts corrected for Solace, CrewAI, AppOrchid. Quantix Mesh AI regressed — grounding gave the model more material to confabulate with, stitching four unrelated companies into one snapshot instead of refusing.
 
-## Notes
+**Stage 3 — Pydantic schema:** `output_schema` forces function-calling mode; Gemini API blocks combining this with built-in tools. Workaround: two-agent pipeline — researcher (search, no schema) → formatter (schema, no tools) via SequentialAgent. Quantix Mesh AI improved — researcher flagged ambiguity, formatter nulled unverifiable fields.
 
-This is a learning repo. Code evolves as concepts are introduced — see `docs/` for what each stage teaches, what changed, and what was observed when running it.
+**Stage 4 — AgentTool:** Custom function tools and built-in tools cannot coexist on the same agent — Gemini API rejects mixed tool mode requests. Solution: dedicated verifier agent wrapped as AgentTool. Funding verdicts: Solace $790M CONFIRMED, CrewAI $20M Series B CONFIRMED, AppOrchid $7.5M correctly flagged outside 12-month window, Quantix $24M Series C UNVERIFIABLE. Disambiguation still broken — requires Stage 6 Critic.
+
+## ADK Quirks
+
+- `adk web` does not hot-reload `agent.py` — restart server after every code change
+- Built-in `google_search` produces no separate trace node — verify via output content, not trace shape
+- `output_schema` and built-in tools cannot coexist on the same agent (API constraint)
+- Custom function tools and built-in tools cannot coexist on the same agent (API constraint)
+- `AgentTool` wrapping isolates each agent's API request — no constraint violations
+- Session bleed in `adk web` — start a new session per vendor run
+- `.env` lives inside `vendor_snapshot/`, not the project root
