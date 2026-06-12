@@ -24,9 +24,9 @@ A hands-on learning project for Google's Agent Development Kit (ADK). The use ca
 
 | Stage | Concept | Doc | Status |
 |-------|---------|-----|--------|
-| 0 | Environment setup, project skeleton, placeholder agent | [stage-0-environment.md](docs/stage-0-environment.md) | ✅ |
+| 0 | Environment setup, project skeleton, placeholder agent | [stage-0-setup.md](docs/stage-0-setup.md) | ✅ |
 | 1 | Single agent, no tools — training data limits | [stage-1-bare-agent.md](docs/stage-1-bare-agent.md) | ✅ |
-| 2 | Built-in Google Search grounding | [stage-2-google-search.md](docs/stage-2-google-search.md) | ✅ |
+| 2 | Built-in Google Search grounding | [stage-2-grounded-search.md](docs/stage-2-grounded-search.md) | ✅ |
 | 3 | Pydantic schema + two-agent search-formatter pipeline | [stage-3-pydantic-schema.md](docs/stage-3-pydantic-schema.md) | ✅ |
 | 4 | Custom function tool + AgentTool composition | [stage-4-custom-tools-agent-tool.md](docs/stage-4-custom-tools-agent-tool.md) | ✅ |
 | 5 | Multi-agent SequentialAgent with output_key session state | — | — |
