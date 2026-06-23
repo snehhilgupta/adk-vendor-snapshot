@@ -29,7 +29,7 @@ A hands-on learning project for Google's Agent Development Kit (ADK). The use ca
 | 2 | Built-in Google Search grounding | [stage-2-grounded-search.md](docs/stage-2-grounded-search.md) | ✅ |
 | 3 | Pydantic schema + two-agent search-formatter pipeline | [stage-3-pydantic-schema.md](docs/stage-3-pydantic-schema.md) | ✅ |
 | 4 | Custom function tool + AgentTool composition | [stage-4-custom-tools-agent-tool.md](docs/stage-4-custom-tools-agent-tool.md) | ✅ |
-| 5 | Multi-agent SequentialAgent with output_key session state | — | — |
+| 5 | Multi-agent SequentialAgent with output_key session state | [stage-5-output-key-state.md](docs/stage-5-output-key-state.md) | ✅ |
 | 6 | Critic agent with deterministic vendor-name-match | — | — |
 | 7 | LoopAgent with termination-on-Critic-approved + callbacks | — | — |
 | 8 | Evaluation with adk eval — test sets, regression on 4 vendors | — | — |
