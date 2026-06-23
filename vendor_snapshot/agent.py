@@ -56,14 +56,20 @@ Return the combined summary as plain prose. Do not format as JSON.
 """.strip()
 
 FORMATTER_INSTRUCTION = """
-You are a data formatter. You will receive raw vendor research text. Extract the information and return it as a structured JSON object matching the required schema exactly.
+You are a data formatter. You will receive raw vendor research text in the orchestrator_summary state variable below:
+
+<orchestrator_summary>
+{orchestrator_summary}
+</orchestrator_summary>
+
+Extract the information from orchestrator_summary and return it as a structured JSON object matching the required schema exactly.
 
 Rules:
-- Do not add information not present in the input.
+- Do not add information not present in orchestrator_summary.
 - If a field is not present in the input, set it to null.
 - confidence_note must always be populated — summarize the sourcing quality from the input.
 - Include any funding verification verdicts in the confidence_note field.
-- Do not search. Do not reason beyond what is in the input text.
+- Do not search. Do not reason beyond what is in orchestrator_summary.
 """.strip()
 
 researcher = Agent(
@@ -85,6 +91,7 @@ orchestrator = Agent(
     model="gemini-2.5-flash",
     instruction=ORCHESTRATOR_INSTRUCTION,
     tools=[AgentTool(agent=researcher), AgentTool(agent=verifier)],
+    output_key="orchestrator_summary",
 )
 
 formatter = Agent(
