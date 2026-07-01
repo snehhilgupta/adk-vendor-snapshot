@@ -69,7 +69,7 @@ Only dimensions actually exercised are listed. Sections 3 (security/compliance),
   is not hard-coupled.
 
 **1.3 Deployment / outbound dependencies**
-- Full self-host on CBRE GCP achieved, zero new outbound vendor calls (no OpenAI,
+- Full self-host on GCP achieved, zero new outbound vendor calls (no OpenAI,
   no AI Studio) once extraction routed through LiteLLM→Vertex.
 - Telemetry: `telemetry: False` in config did NOT suppress PostHog — the client
   still initialized. Opt-out via config alone is unreliable in 2.0.8; env-var

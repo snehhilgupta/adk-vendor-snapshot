@@ -17,7 +17,7 @@ A hands-on learning project for Google's Agent Development Kit (ADK). The use ca
 
 - Python 3.14, Windows, VS Code, PowerShell
 - ADK 2.1.0
-- Gemini 2.5 Flash via Vertex AI (CBRE GCP project)
+- Gemini 2.5 Flash via Vertex AI (GCP project)
 - Git + GitHub
 
 ## Study Path
@@ -34,6 +34,7 @@ A hands-on learning project for Google's Agent Development Kit (ADK). The use ca
 | 7 | LoopAgent with termination-on-Critic-approved + callbacks | — | — |
 | 8 | Evaluation with adk eval — test sets, regression on 4 vendors | — | — |
 | 9 | Session state and in-process memory | — | — |
+| 9.1 | Mem0 — external memory as system-of-record cache | [stage-9-1-mem0-memory-system-of-record.md](docs/stage-9-1-mem0-memory-system-of-record.md) | ✅ |
 | 10 | Deployment surfaces — architectural read-only | — | — |
 
 ## Repository Structure
@@ -43,13 +44,17 @@ adk-vendor-snapshot/
 ├── vendor_snapshot/
 │   ├── __init__.py
 │   ├── agent.py
+│   ├── mem0_store.py
+│   ├── pipeline.py
+│   ├── vendor_service.py
 │   └── .env
 ├── docs/
 │   ├── stage-0-environment.md
 │   ├── stage-1-bare-agent.md
 │   ├── stage-2-google-search.md
 │   ├── stage-3-pydantic-schema.md
-│   └── stage-4-custom-tools-agent-tool.md
+│   ├── stage-4-custom-tools-agent-tool.md
+│   └── stage-9-1-mem0-memory-system-of-record.md
 ├── .gitignore
 └── README.md
 ```
