@@ -21,3 +21,13 @@ Thumbs.db
 
 # ADK
 .adk/
+# Stage 9.1 local cache and throwaway tests
+vendor_snapshot/qdrant_data/
+vendor_snapshot/mem0_smoke_test.py
+vendor_snapshot/mem0_store_test.py
+vendor_snapshot/pipeline_test.py
+vendor_snapshot/vendor_service_test.py
+vendor_snapshot/xsession_test.py
+vendor_snapshot/staleness_test.py
+vendor_snapshot/disambig_test.py
+vendor_snapshot/quantix_test.py
