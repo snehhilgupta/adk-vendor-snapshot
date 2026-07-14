@@ -33,8 +33,11 @@ A hands-on learning project for Google's Agent Development Kit (ADK). The use ca
 | 6 | Critic agent with deterministic vendor-name-match | — | — |
 | 7 | LoopAgent with termination-on-Critic-approved + callbacks | — | — |
 | 8 | Evaluation with adk eval — test sets, regression on 4 vendors | — | — |
-| 9 | Session state and in-process memory | — | — |
-| 9.1 | Mem0 — external memory as system-of-record cache | [stage-9-1-mem0-memory-system-of-record.md](docs/stage-9-1-mem0-memory-system-of-record.md) | ✅ |
+| 9 | Session state + in-process memory (InMemorySessionService) — Google/ADK native | — | — |
+| 9.1 | External memory as system-of-record cache — Mem0 OSS | [stage-9-1-mem0-memory-system-of-record.md](docs/stage-9-1-mem0-memory-system-of-record.md) | ✅ |
+| 9.2 | AgentCore Memory (short-term DynamoDB + long-term vector) — AWS Bedrock | — | in progress |
+| 9.3 | Vertex AI Memory Bank (managed) — Google | — | — |
+| 9.4 | MAF agent harness + Foundry IQ memory — Azure | — | — |
 | 10 | Deployment surfaces — architectural read-only | — | — |
 
 ## Repository Structure
