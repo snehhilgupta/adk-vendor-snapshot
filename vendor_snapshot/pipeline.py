@@ -4,14 +4,20 @@ pipeline.py — programmatic entry point for the Stage 5 SequentialAgent.
 Wraps root_agent (vendor_orchestrator -> vendor_formatter) in an ADK Runner
 so the pipeline can be invoked for a single vendor outside `adk web` and
 return the VendorSnapshot as a dict. This is what the Mem0 cache layer gates.
+
+Stage 9.3: added VertexAiMemoryBankService as memory_service. Sessions stay
+fresh-per-run (unchanged); Memory Bank persistence is keyed by scope/user_id,
+independent of session lifecycle.
 """
 from dotenv import load_dotenv
 load_dotenv()
 
 import json
+import os
 import uuid
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
+from google.adk.memory import VertexAiMemoryBankService
 from google.genai import types
 
 from agent import root_agent
@@ -27,13 +33,18 @@ async def run_pipeline(vendor: str) -> dict:
     so the caller can decide — we do not silently swallow malformed output.
     """
     session_service = InMemorySessionService()
+    memory_service = VertexAiMemoryBankService(
+        project=os.environ["GOOGLE_CLOUD_PROJECT"],
+        location=os.environ["GOOGLE_CLOUD_LOCATION"],
+        agent_engine_id=os.environ["AGENT_ENGINE_ID"],
+    )
     runner = Runner(
         agent=root_agent,
         app_name=APP_NAME,
         session_service=session_service,
+        memory_service=memory_service,
     )
 
-    # Fresh session per run — avoids the session-bleed quirk from adk web.
     session_id = f"sess-{uuid.uuid4().hex[:8]}"
     await session_service.create_session(
         app_name=APP_NAME,
