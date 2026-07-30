@@ -10,7 +10,7 @@ two-agent workaround.
 - Split single agent into two: `vendor_researcher` (search, no schema) and
   `vendor_formatter` (schema, no tools)
 - Wired via `SequentialAgent` as `root_agent`
-- Switched from AI Studio free tier to Vertex AI (CBRE GCP project) due to
+- Switched from AI Studio free tier to Vertex AI (GCP project) due to
   20 req/day free tier cap
 
 ## The ADK Constraint
@@ -51,4 +51,4 @@ search and formatting concerns into two agents.
 ## Environment Note
 Switched to Vertex AI mid-stage due to free tier quota exhaustion (20 req/day,
 two-agent pipeline = 2 req/run). Auth via `gcloud auth application-default
-login`, quota project `REDACTED-PROJECT-ID`.
+login`, quota project `TBD`.
